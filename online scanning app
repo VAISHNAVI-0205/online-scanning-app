@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Scanning App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #videoElement {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border: 2px solid #333;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            display: none;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #scannedImage {
+            margin-top: 20px;
+            max-width: 100%;
+            max-height: 500px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Online Document Scanning App</h1>
+
+    <!-- Video element to show live camera feed -->
+    <video id="videoElement" autoplay></video>
+
+    <div class="action-buttons">
+        <button id="captureBtn">Capture Image</button>
+        <button id="downloadBtn" style="display:none;">Download Image</button>
+    </div>
+
+    <!-- Canvas to capture the image -->
+    <canvas id="canvas"></canvas>
+
+    <!-- Display scanned image -->
+    <img id="scannedImage" alt="Scanned Image will appear here">
+
+    <script>
+        // Variables
+        const videoElement = document.getElementById("videoElement");
+        const captureBtn = document.getElementById("captureBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const scannedImage = document.getElementById("scannedImage");
+
+        // Access the webcam
+        async function startVideo() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+            } catch (error) {
+                alert("Unable to access the camera.");
+            }
+        }
+
+        // Capture image from video
+        captureBtn.addEventListener("click", function() {
+            // Set canvas size to match video dimensions
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+
+            // Draw the current video frame on the canvas
+            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+            // Show the captured image
+            scannedImage.src = canvas.toDataURL("image/png");
+
+            // Display download button
+            downloadBtn.style.display = "inline-block";
+        });
+
+        // Download the captured image
+        downloadBtn.addEventListener("click", function() {
+            const dataUrl = canvas.toDataURL("image/png");
+            const a = document.createElement("a");
+            a.href = dataUrl;
+            a.download = "scanned_image.png";
+            a.click();
+        });
+
+        // Start video when the page loads
+        window.onload = startVideo;
+    </script>
+
+</body>
+</html>
